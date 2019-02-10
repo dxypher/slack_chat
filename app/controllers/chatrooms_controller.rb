@@ -10,6 +10,7 @@ class ChatroomsController < ApplicationController
   # GET /chatrooms/1
   # GET /chatrooms/1.json
   def show
+    @messages = @chatroom.recent_messages
   end
 
   # GET /chatrooms/new
