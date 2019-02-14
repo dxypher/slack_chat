@@ -6,12 +6,19 @@ App.chatrooms = App.cable.subscriptions.create "ChatroomsChannel",
     # Called when the subscription has been terminated by the server
 
   received: (data) ->
-    active_channel = $("[data-behavior='messages'][data-chatroom-id='#{data.chatroom_id}']")
-    if active_channel.length > 0
-      active_channel.append("<div><strong>#{data.username}:</strong> #{data.body}</div>")
+    active_chatroom = $("[data-behavior='messages'][data-chatroom-id='#{data.chatroom_id}']")
+    if active_chatroom.length > 0
+      if document.hidden
+        if $(".strike").length == 0
+          active_chatroom.append("<div class='strike'><span>Unread Messages</span></div>")
+        if Notification.permission == 'granted'
+          new Notification(data.username, {body: data.body})
 
-      if document.hidden && Notification.permission == 'granted'
-        new Notification(data.username, {body: data.body})
+      else
+        App.last_read.update(data.chatroom_id)
+  
+      # insert the message
+      active_chatroom.append("<div><strong>#{data.username}:</strong> #{data.body}</div>")
 
     else
       $("[data-behavior='chatroom-link'][data-chatroom-id='#{data.chatroom_id}']").css("font-weight", "bold")
